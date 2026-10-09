@@ -1,0 +1,32 @@
+name: Build JoJo APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build APK
+        run: |
+          npm install -g cordova
+          cordova create app com.jojo.assistant JoJo
+          cp jojo_assistant.html app/www/index.html
+          cd app
+          cordova platform add android
+          cordova build android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JoJo-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
